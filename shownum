@@ -1,0 +1,19 @@
+#!/usr/bin/python3
+
+import sys
+import argparse
+
+
+def main():
+    parser = argparse.ArgumentParser(prog="shownum")
+    parser.add_argument("file")
+    parser.add_argument("-l", "--little-endian", action="store_true")
+    parser.add_argument("-s", "--signed", action="store_true")
+    args = parser.parse_args()
+    with open(args.file, "rb") as f:
+        print(int.from_bytes(f.read(), byteorder=("little" if args.little_endian else "big"), signed=args.signed))
+
+
+if __name__ == "__main__":
+    main()
+

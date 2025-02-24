@@ -1,0 +1,51 @@
+#!/usr/bin/python3
+
+import sys
+import signal
+import argparse
+
+
+def main():
+    parser = argparse.ArgumentParser(prog="Fibonacci(N)")
+    parser.add_argument("N", type=int)
+    parser.add_argument("-b", "--binary", action="store_true")
+    parser.add_argument("-o", "--output", default=None)
+    parser.add_argument("-p", "--prev", default=None)
+    args = parser.parse_args()
+    if args.N < 0:
+        print("Error: negative N passed.", file=sys.stderr)
+        sys.exit(1)
+    sys.set_int_max_str_digits(0)
+    i = 0
+    j = 1
+    n = 1
+    if args.N == 0:
+        i = 1
+        j = 0
+    while n < args.N:
+        k = j
+        j += i
+        i = k
+        n += 1
+    if args.binary:
+        if args.output:
+            with open(args.output, "wb") as f:
+                f.write(j.to_bytes(length=(j.bit_length() + 7)//8, byteorder="big"))
+        else:
+            sys.stdout.buffer.write(j.to_bytes(length=(j.bit_length() + 7)//8, byteorder="big"))
+        if args.prev:
+            with open(args.prev, "wb") as f:
+                f.write(i.to_bytes(length=(i.bit_length() + 7)//8, byteorder="big"))
+    else:
+        if args.output:
+            with open(args.output, "w") as f:
+                f.write(f"{j}\n")
+        else:
+            print(j)
+        if args.prev:
+            with open(args.prev, "w") as f:
+                f.write(f"{i}\n")
+
+if __name__ == "__main__":
+    main()
+

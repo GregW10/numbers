@@ -2,5 +2,14 @@ log
 pid
 mppid
 mplog
+out
+shit
+
+*pid
+*log
 
 *.txt
+*.sha512
+*.bin
+*.gz
+*.xz
