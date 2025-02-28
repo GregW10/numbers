@@ -1,0 +1,82 @@
+#!/usr/bin/python3
+
+import sys
+import copy
+import signal
+import argparse
+
+
+def matmul(l1: list, l2: list):
+    return [[l1[0][0]*l2[0][0] + l1[0][1]*l2[1][0], l1[0][0]*l2[0][1] + l1[0][1]*l2[1][1]],
+            [l1[1][0]*l2[0][0] + l1[1][1]*l2[1][0], l1[1][0]*l2[0][1] + l1[1][1]*l2[1][1]]]
+
+
+
+def matsq(li: list):
+    return [[li[0][0]*li[0][0] + li[0][1]*li[1][0], li[0][0]*li[0][1] + li[0][1]*li[1][1]],
+            [li[1][0]*li[0][0] + li[1][1]*li[1][0], li[1][0]*li[0][1] + li[1][1]*li[1][1]]]
+
+
+def matpower(mat: list, N: int):
+    if N == 0:
+        return [[1, 0], [0, 1]]
+    if N == 1:
+        return mat
+    if (N & (N - 1)) == 0:
+        while N > 1:
+            print(N)
+            mat = matsq(mat)
+            N //= 2
+        return mat
+    base = [[1, 0], [0, 1]]
+    nmat = copy.deepcopy(mat)
+    while N > 1:
+        print(N)
+        if N % 2:
+            base = matmul(base, nmat)
+        nmat = matsq(nmat)
+        N //= 2
+    return matmul(base, nmat)
+
+
+def main():
+    parser = argparse.ArgumentParser(prog="Fibonacci(N)")
+    parser.add_argument("N", type=int)
+    parser.add_argument("-b", "--binary", action="store_true")
+    parser.add_argument("-o", "--output", default=None)
+    parser.add_argument("-p", "--prev", default=None)
+    args = parser.parse_args()
+    if args.N < 0:
+        print("Error: negative N passed.", file=sys.stderr)
+        sys.exit(1)
+    sys.set_int_max_str_digits(0)
+    if args.N == 0:
+        i = 1
+        j = 0
+    else:
+        res = matpower([[1, 1], [1, 0]], args.N - 1)
+        if args.prev:
+            i = int(res[1][0])
+        j = int(res[0][0])
+    if args.binary:
+        if args.output:
+            with open(args.output, "wb") as f:
+                f.write(j.to_bytes(length=(j.bit_length() + 7)//8, byteorder="big"))
+        else:
+            sys.stdout.buffer.write(j.to_bytes(length=(j.bit_length() + 7)//8, byteorder="big"))
+        if args.prev:
+            with open(args.prev, "wb") as f:
+                f.write(i.to_bytes(length=(i.bit_length() + 7)//8, byteorder="big"))
+    else:
+        if args.output:
+            with open(args.output, "w") as f:
+                f.write(f"{j}\n")
+        else:
+            print(j)
+        if args.prev:
+            with open(args.prev, "w") as f:
+                f.write(f"{i}\n")
+
+if __name__ == "__main__":
+    main()
+
